@@ -1,0 +1,12 @@
+conf
+#
+set policy prefix-list customer-prefixes rule 10 prefix 10.10.0.0/16
+set policy prefix-list customer-prefixes rule 10 prefix 10.20.0.0/16
+set policy prefix-list customer-prefixes rule 10 le 32 <--Applies a match in rule for all Nets smaller as well
+#
+set policy route-map customer-prefixes rule 10 match ip address prefix-list customer-prefixes
+#
+set protocols bgp 65000 neighbor 22.0.0.1 remote-as 668
+set protocols bgp 65000 address-family ipv4-unicast redistribute connected route-map customer-prefixes
+set protocols bgp 65000 address-family ipv4-unicast redistribute static route-map customer-prefixes
+#

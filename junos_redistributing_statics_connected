@@ -1,0 +1,24 @@
+set policy-options prefix-list customer-prefixes 10.10.0.0/16
+set policy-options prefix-list customer-prefixes 10.20.0.0/16
+#
+set policy-options policy-statement customer-prefixes term 10 from protocol bgp
+set policy-options policy-statement customer-prefixes term 10 from protocol static prefix-list customer-prefixes
+set policy-options policy-statement customer-prefixes term 10 from protocol direct prefix-list customer-prefixes
+set policy-options policy-statement customer-prefixes term 10 then accept
+#
+set routing-instances instance-type vrf
+set routing-instances route-distinguisher 65000:100
+set routing-instances vrf-table-label
+set routing-instances protocols bgp group CUSTOMER001 export customer-prefixes
+set routing-instances protocols bgp group CUSTOMER001 peer-as 668
+set routing-instances protocols bgp group CUSTOMER001 neighbor 22.0.0.1
+#
+int xe-1/0/0
+description WAN Interface
+ip address 22.0.0.2 255.255.255.254
+#
+int ge-0/0/0
+ip address 10.10.0.1 255.255.0.0
+#
+set routing-options static route 10.20.0.0/16 next-hop 10.10.0.254
+#

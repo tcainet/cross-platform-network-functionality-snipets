@@ -1,0 +1,24 @@
+conf t
+!
+ip prefix-list customer-prefixes permit 10.10.0.0/16
+ip prefix-list customer-prefixes permit 10.20.0.0/16
+!
+route-map cust-prefixes permit 10
+ match ip address prefix-list customer-prefixes
+!
+router bgp 65000
+bgp log-neighbor-changes
+bgp deterministic-med
+neighbor 22.0.0.1 remote-as 668
+redistribute connected route-map customer-prefixes
+redistribute static route-map customer-prefixes
+!
+int Te0
+description WAN Interface
+ip address 22.0.0.2 255.255.255.254
+!
+int Gig0/0/0
+ip address 10.10.0.1 255.255.0.0
+!
+ip route 10.20.0.0 255.255.0.0 Gig0/0/0 10.10.0.254 name Cascaded_LAN-Subnet
+!
